@@ -17,22 +17,41 @@ class ProcessingStatus(Enum):
 @dataclass
 class MetadataRecord:
     """Represents a parsed metadata record from a JS file."""
+
     note_unid: str
     sys_name: str
     status: str
     file_name: str
+
+    # Parser validation
     is_valid: bool = True
     parse_errors: list = field(default_factory=list)
+
+    # Processing outcome
+    result: str = ""
+    reason: str = ""
+
+    # Future use
+    is_duplicate: bool = False
+
 
 
 @dataclass
 class ClassificationResult:
     """Result of classifying records by sys_name."""
-    sys_name: str
-    total_records: int
-    unique_note_count: int
-    note_unids: list = field(default_factory=list)
 
+    sys_name: str
+
+    total_records: int
+
+    valid_records: int = 0
+
+    # Actual metadata status for this system
+    status_summary: str = ""
+
+    unique_note_count: int = 0
+
+    note_unids: list = field(default_factory=list)
 
 @dataclass
 class ProcessingStats:
@@ -74,10 +93,19 @@ class ProcessingStats:
 @dataclass
 class LogEntry:
     """A log entry for processing activities."""
+
     timestamp: datetime
+
     file_name: str
+
     action: str
+
     status: str
+
+    result: str = ""
+
+    reason: str = ""
+
     error_message: Optional[str] = None
 
     def to_dict(self) -> dict:
@@ -86,12 +114,24 @@ class LogEntry:
             "file_name": self.file_name,
             "action": self.action,
             "status": self.status,
+            "result": self.result,
+            "reason": self.reason,
             "error_message": self.error_message or "",
         }
 
-
 @dataclass
 class SkippedFile:
-    """Record of a skipped file."""
+    """Represents a file that was rejected or skipped during processing."""
+
     file_name: str
-    reason: str
+
+    # Metadata (if successfully parsed)
+    sys_name: str = ""
+    note_unid: str = ""
+    status: str = ""
+
+    # Reason for rejection/skipping
+    reason: str = ""
+
+    # Processing outcome
+    result: str = "Rejected"

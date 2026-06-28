@@ -109,8 +109,19 @@ class StatsResponse(BaseModel):
 
 class ClassificationResult(BaseModel):
     sys_name: str
+
     total_records: int
+
+    valid_records: int
+
+    cancelled_records: int
+
+    accepted_status: str
+
+    cancelled_status: str
+
     unique_note_count: int
+
     note_unids: List[str]
 
 
@@ -240,7 +251,9 @@ async def process_uploaded_zip(file: UploadFile = File(...)):
         state.stats = stats
 
         # Classify records
-        classifications = state.classification_engine.classify(valid)
+        classifications = state.classification_engine.classify(
+            valid + cancelled
+        )
         state.stats.unique_systems = len(classifications)
 
         # Generate Excel report
@@ -302,7 +315,9 @@ async def process_folder(folder_path: str):
         state.skipped_files = skipped
         state.stats = stats
 
-        classifications = state.classification_engine.classify(valid)
+        classifications = state.classification_engine.classify(
+            valid + cancelled
+       )
         state.stats.unique_systems = len(classifications)
 
         generator = ExcelGenerator()
@@ -382,6 +397,8 @@ async def get_classifications():
             {
                 "sys_name": c.sys_name,
                 "total_records": c.total_records,
+                "valid_records": c.valid_records,
+                "status_summary": c.status_summary,
                 "unique_note_count": c.unique_note_count,
                 "note_unids": c.note_unids[:100]  # Limit for response size
             }
@@ -404,6 +421,8 @@ async def search_records(query: SearchQuery):
             {
                 "sys_name": r.sys_name,
                 "total_records": r.total_records,
+                "valid_records": r.valid_records,
+                "status_summary": r.status_summary,
                 "unique_note_count": r.unique_note_count,
                 "note_unids": r.note_unids[:50]
             }

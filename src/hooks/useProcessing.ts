@@ -146,6 +146,6 @@ export function formatDuration(seconds: number): string {
   return `${hours}h ${mins}m`;
 }
 
-export function formatNumber(num: number): string {
-  return num.toLocaleString();
+export function formatNumber(value?: number) {
+  return (value ?? 0).toLocaleString();
 }

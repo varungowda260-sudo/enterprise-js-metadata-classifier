@@ -15,7 +15,6 @@ import {
   AlertCircle,
   CheckCircle2,
   XCircle,
-  FileSearch,
   TestTube,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -71,6 +70,7 @@ function ThemeToggle() {
   );
 }
 
+
 function StatCard({
   title,
   value,
@@ -107,44 +107,64 @@ function ProcessingDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [wsConnected, setWsConnected] = useState(false);
-  const [activityLog, setActivityLog] = useState<string[]>([]);
   const [parserTestResult, setParserTestResult] = useState<ParserTestResult | null>(null);
   const [parserTestLoading, setParserTestLoading] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const parserTestInputRef = useRef<HTMLInputElement>(null);
+  const reconnectTimer = useRef<number | null>(null);
+  const connectWebSocket = () => {
+  console.log("[App] Connecting WebSocket...");
+
+  wsRef.current = createWebSocket((data) => {
+    const msg = data as {
+      type: string;
+      data: ProcessingStats;
+    };
+
+    if (msg.type === "progress" || msg.type === "init") {
+      setStats(msg.data);
+
+      if (msg.data.status === "running") {
+        setIsProcessing(true);
+      } else if (
+        msg.data.status === "completed" ||
+        msg.data.status === "cancelled" ||
+        msg.data.status === "error"
+      ) {
+        setIsProcessing(false);
+      }
+    }
+  });
+
+  wsRef.current.onopen = () => {
+    console.log("[WS] Connected");
+    setWsConnected(true);
+  };
+
+  wsRef.current.onclose = () => {
+    console.log("[WS] Disconnected");
+    setWsConnected(false);
+
+    reconnectTimer.current = window.setTimeout(() => {
+      connectWebSocket();
+    }, 2000);
+  };
+};
 
   // Initialize WebSocket
   useEffect(() => {
-    console.log('[App] Initializing WebSocket connection...');
-    wsRef.current = createWebSocket((data) => {
-      const msg = data as { type: string; data: ProcessingStats };
-      console.log('[App] Received WebSocket message type:', msg.type);
-      if (msg.type === 'progress' || msg.type === 'init') {
-        setStats(msg.data);
-        if (msg.data.status === 'running') {
-          setIsProcessing(true);
-        } else if (msg.data.status === 'completed' || msg.data.status === 'cancelled') {
-          setIsProcessing(false);
-        }
-      }
-    });
+  connectWebSocket();
 
-    wsRef.current.onopen = () => {
-      console.log('[App] WebSocket onopen - setting wsConnected to true');
-      setWsConnected(true);
-    };
-    wsRef.current.onclose = () => {
-      console.log('[App] WebSocket onclose - setting wsConnected to false');
-      setWsConnected(false);
-    };
+  return () => {
+    wsRef.current?.close();
 
-    return () => {
-      console.log('[App] Cleanup - closing WebSocket');
-      wsRef.current?.close();
-    };
-  }, []);
+    if (reconnectTimer.current) {
+      clearTimeout(reconnectTimer.current);
+    }
+  };
+}, []);
 
   // Fetch classifications when processing completes
   useEffect(() => {
@@ -172,12 +192,6 @@ function ProcessingDashboard() {
     }
   };
 
-  const addActivity = (message: string) => {
-    setActivityLog((prev) => [
-      `[${new Date().toLocaleTimeString()}] ${message}`,
-      ...prev.slice(0, 99),
-    ]);
-  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -189,14 +203,12 @@ function ProcessingDashboard() {
     }
 
     setIsProcessing(true);
-    addActivity(`Starting processing: ${file.name}`);
+    
 
     try {
       const result = await api.processZip(file);
-      addActivity(`Processing completed: ${result.valid_records} valid records`);
       toast.success(`Processed ${result.valid_records} records from ${file.name}`);
     } catch (error) {
-      addActivity(`Processing failed: ${error}`);
       toast.error(`Processing failed: ${error}`);
       setIsProcessing(false);
     }
@@ -209,7 +221,6 @@ function ProcessingDashboard() {
   const handlePause = async () => {
     try {
       await api.pause();
-      addActivity('Processing paused');
       toast.info('Processing paused');
     } catch (e) {
       toast.error('Failed to pause processing');
@@ -219,7 +230,6 @@ function ProcessingDashboard() {
   const handleResume = async () => {
     try {
       await api.resume();
-      addActivity('Processing resumed');
       toast.success('Processing resumed');
     } catch (e) {
       toast.error('Failed to resume processing');
@@ -229,7 +239,6 @@ function ProcessingDashboard() {
   const handleCancel = async () => {
     try {
       await api.cancel();
-      addActivity('Processing cancelled');
       toast.warning('Processing cancelled');
       setIsProcessing(false);
     } catch (e) {
@@ -238,31 +247,47 @@ function ProcessingDashboard() {
   };
 
   const handleReset = async () => {
-    try {
-      await api.reset();
-      setStats(initialStats);
-      setClassifications([]);
-      setLogs([]);
-      setActivityLog([]);
-      addActivity('Session reset');
-      toast.success('Session reset');
-    } catch (e) {
-      toast.error('Failed to reset session');
+  try {
+    await api.reset();
+
+    setStats(initialStats);
+    setClassifications([]);
+    setLogs([]);
+   
+
+    // Clear parser test
+    setParserTestResult(null);
+    setParserTestLoading(false);
+
+    if (parserTestInputRef.current) {
+      parserTestInputRef.current.value = "";
     }
-  };
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+   
+    toast.success("Session reset");
+  } catch (e) {
+    toast.error("Failed to reset session");
+  }
+};
 
   const handleExportExcel = async () => {
-    if (stats.status !== 'completed') {
-      toast.error('No data to export. Process files first.');
-      return;
-    }
-    window.open(api.exportExcel(), '_blank');
-    addActivity('Excel report downloaded');
-  };
+  if (stats.status !== "completed") {
+    toast.error("No data to export. Process files first.");
+    return;
+  }
+
+  window.location.href = api.exportExcel();
+
+ 
+};
 
   const handleExportLogs = (format: 'json' | 'csv') => {
     window.open(api.exportLogs(format), '_blank');
-    addActivity(`Logs exported as ${format.toUpperCase()}`);
+    
   };
 
   const handleParserTest = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -306,7 +331,11 @@ function ProcessingDashboard() {
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <FileSearch className="h-6 w-6 text-primary" />
+            <img
+               src="/logo.png"
+               alt="JavaScript Metadata Classification System"
+               className="h-8 w-8"
+             />
             <h1 className="text-xl font-bold">JavaScript Metadata Classifier</h1>
           </div>
           <div className="flex items-center gap-2">
@@ -528,24 +557,35 @@ function ProcessingDashboard() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Sys Name</TableHead>
-                          <TableHead className="text-right">Total Records</TableHead>
+                          <TableHead className="text-right">Valid Records</TableHead>
+                          <TableHead className="w-[340px]">Status Summary</TableHead>
                           <TableHead className="text-right">Unique Notes</TableHead>
-                          <TableHead className="max-w-xs">Note UNIDs</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {filteredClassifications.map((c) => (
-                          <TableRow key={c.sys_name}>
-                            <TableCell className="font-medium">{c.sys_name}</TableCell>
-                            <TableCell className="text-right">{formatNumber(c.total_records)}</TableCell>
-                            <TableCell className="text-right">{formatNumber(c.unique_note_count)}</TableCell>
-                            <TableCell className="max-w-xs">
-                              <span className="text-xs text-muted-foreground truncate block">
-                                {c.note_unids.slice(0, 5).join(', ')}
-                                {c.note_unids.length > 5 && `... +${c.note_unids.length - 5} more`}
-                              </span>
-                            </TableCell>
-                          </TableRow>
+                                  <TableRow key={c.sys_name}>
+                          <TableCell className="font-medium">
+                            {c.sys_name}
+                          </TableCell>
+
+                          <TableCell className="text-right">
+                            {formatNumber(c.valid_records)}
+                          </TableCell>
+
+                          <TableCell className="align-top text-sm leading-6 whitespace-normal break-words max-w-[340px]">
+                                {c.status_summary
+                                  ? c.status_summary.split(", ").map((s, i) => (
+                                      <div key={i}>{s}</div>
+                                    ))
+                                  : "-"}
+                          </TableCell>
+                          
+
+                          <TableCell className="text-right">
+                            {formatNumber(c.unique_note_count)}
+                          </TableCell>
+                        </TableRow>
                         ))}
                       </TableBody>
                     </Table>
@@ -580,28 +620,69 @@ function ProcessingDashboard() {
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[500px]">
-                  {activityLog.length === 0 ? (
-                    <div className="py-12 text-center text-muted-foreground">
-                      No activity yet
-                    </div>
-                  ) : (
-                    <div className="space-y-1 font-mono text-sm">
-                      {activityLog.map((entry, i) => (
-                        <div
-                          key={i}
-                          className={`py-1 px-2 rounded ${
-                            entry.includes('Error') || entry.includes('Failed')
-                              ? 'bg-red-500/10 text-red-600 dark:text-red-400'
-                              : entry.includes('Completed')
-                              ? 'bg-green-500/10 text-green-600 dark:text-green-400'
-                              : 'bg-muted/50'
-                          }`}
-                        >
-                          {entry}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  {logs.length === 0 ? (
+  <div className="py-12 text-center text-muted-foreground">
+    No activity available
+  </div>
+) : (
+  <Table>
+    <TableHeader>
+      <TableRow>
+        <TableHead>Time</TableHead>
+        <TableHead>File</TableHead>
+        <TableHead>Processing</TableHead>
+        <TableHead>Status</TableHead>
+        <TableHead>Outcome</TableHead>
+        <TableHead>Reason</TableHead>
+      </TableRow>
+    </TableHeader>
+
+    <TableBody>
+      {logs
+        .slice()
+        .reverse()
+        .map((log, i) => (
+          <TableRow key={i}>
+            <TableCell className="text-xs text-muted-foreground">
+              {new Date(log.timestamp).toLocaleTimeString()}
+            </TableCell>
+
+            <TableCell className="font-mono text-xs">
+              {log.file_name}
+            </TableCell>
+
+            <TableCell>
+              <Badge variant="outline">
+                {log.action}
+              </Badge>
+            </TableCell>
+
+            <TableCell>
+              <Badge
+                variant={
+                  log.status === "error"
+                    ? "destructive"
+                    : log.status === "success"
+                    ? "default"
+                    : "secondary"
+                }
+              >
+                {log.status}
+              </Badge>
+            </TableCell>
+
+            <TableCell>
+              {log.result || "-"}
+            </TableCell>
+
+            <TableCell className="text-sm">
+              {log.reason || log.error_message || "-"}
+            </TableCell>
+          </TableRow>
+        ))}
+    </TableBody>
+  </Table>
+)}
                 </ScrollArea>
               </CardContent>
             </Card>

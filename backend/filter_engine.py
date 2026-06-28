@@ -15,6 +15,8 @@ from typing import Any, Callable, Optional
 from models import MetadataRecord
 
 
+VALID_STATUS = "closed"
+
 class FilterOperator(Enum):
     """Supported filter operators."""
     EQUALS = "equals"
@@ -63,25 +65,43 @@ class Filter(ABC):
 
 class StatusFilter(Filter):
     """
-    Filter for status field.
-    Default implementation: exclude records where status == "Cancel" (case insensitive).
+    Accept ONLY records whose status is exactly 'closed'
+    (case-insensitive).
+
+    Accepted:
+        Closed
+        CLOSED
+        closed
+
+    Rejected:
+        Closed/Cancel
+        Closed/ABC
+        Cancel
+        Draft
+        In Progress
+        ""
+        None
     """
 
-    def __init__(
-        self,
-        excluded_statuses: list[str] = None,
-        case_sensitive: bool = False
-    ):
-        self.excluded_statuses = [s.lower() for s in (excluded_statuses or ["Cancel"])]
+    def __init__(self, case_sensitive: bool = False):
         self.case_sensitive = case_sensitive
 
     def matches(self, record: MetadataRecord) -> bool:
-        """Check if status should be excluded."""
-        if not record.status:
-            return False
+        """
+        Return True if record should be EXCLUDED.
+        """
 
-        status_to_check = record.status if self.case_sensitive else record.status.lower()
-        return status_to_check in self.excluded_statuses
+        # Missing status -> reject
+        if not record.status:
+            return True
+
+        status = record.status.strip()
+
+        if not self.case_sensitive:
+            status = status.lower()
+
+        # Accept ONLY exact "closed"
+        return status != VALID_STATUS
 
     def get_action(self) -> FilterAction:
         return FilterAction.EXCLUDE
@@ -161,7 +181,7 @@ class FilterEngine:
     def _initialize_default_filters(self):
         """Initialize with default filter rules."""
         # Default: exclude cancelled records
-        self.add_filter(StatusFilter(excluded_statuses=["Cancel"]))
+        self.add_filter(StatusFilter())
 
     def add_filter(self, filter_obj: Filter) -> None:
         """Add a filter to the engine."""
@@ -194,7 +214,7 @@ class FilterEngine:
             if f.matches(record):
                 action = f.get_action()
                 if action == FilterAction.EXCLUDE:
-                    return False, f"Excluded by filter: {type(f).__name__}"
+                    return False, f"Status: {record.status}"
                 elif action == FilterAction.INCLUDE:
                     return True, "Included by filter"
 
@@ -221,4 +241,5 @@ class FilterEngine:
             else:
                 excluded.append(record)
 
+        
         return included, excluded

@@ -25,52 +25,71 @@ class ProcessingLogger:
         file_name: str,
         action: str,
         status: str,
-        error_message: Optional[str] = None
+        error_message: Optional[str] = None,
+        result: str = "",
+        reason: str = ""
     ) -> LogEntry:
         """
         Log a processing activity.
-
-        Args:
-            file_name: Name of the file being processed
-            action: Action being performed (e.g., "parse", "filter", "classify")
-            status: Status of the action (e.g., "success", "error", "skipped")
-            error_message: Optional error message if status is "error"
-
-        Returns:
-            The created LogEntry
         """
+
         entry = LogEntry(
             timestamp=datetime.now(),
             file_name=file_name,
             action=action,
             status=status,
+            result=result,
+            reason=reason,
             error_message=error_message
         )
 
         self.entries.append(entry)
 
-        # Prevent memory overflow for very large datasets
         if len(self.entries) > self.max_entries:
-            # Keep the most recent entries
             self.entries = self.entries[-self.max_entries:]
 
         return entry
 
     def log_parse_success(self, file_name: str) -> LogEntry:
         """Log successful parsing."""
-        return self.log(file_name, "parse", "success")
+        return self.log(
+            file_name=file_name,
+            action="Completed",
+            status="success",
+            result="Accepted",
+            reason="Passed all validation filters"
+        )
 
     def log_parse_error(self, file_name: str, error: str) -> LogEntry:
         """Log parsing error."""
-        return self.log(file_name, "parse", "error", error)
+        return self.log(
+            file_name=file_name,
+            action="Completed",
+            status="error",
+            error_message=error,
+            result="Failed",
+            reason=error
+        )
 
     def log_filter_skip(self, file_name: str, reason: str) -> LogEntry:
         """Log filtered/skipped record."""
-        return self.log(file_name, "filter", "skipped", reason)
+        return self.log(
+            file_name=file_name,
+            action="Completed",
+            status="success",
+            result="Rejected",
+            reason=reason
+        )
 
     def log_classify_success(self, file_name: str) -> LogEntry:
         """Log successful classification."""
-        return self.log(file_name, "classify", "success")
+        return self.log(
+            file_name=file_name,
+            action="Completed",
+            status="success",
+            result="Accepted",
+            reason="Passed all validation filters"
+        )
 
     def get_entries(self) -> List[LogEntry]:
         """Get all log entries."""

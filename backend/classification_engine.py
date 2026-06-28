@@ -40,16 +40,43 @@ class ClassificationEngine:
         for sys_name, sys_records in self._records_by_system.items():
             # Collect unique note_unids
             unique_unids = set()
+
             for r in sys_records:
                 if r.note_unid:
                     unique_unids.add(r.note_unid)
-
+            # Count occurrences of each status
+            status_counts = {}
+            
+            for r in sys_records:
+                status = (r.status or "").strip()
+            
+                if status:
+                    status_counts[status] = status_counts.get(status, 0) + 1
+            status_summary = ", ".join(
+                f"{status} ({count})"
+                for status, count in sorted(
+                    status_counts.items(),
+                    key=lambda x: x[1],
+                    reverse=True
+            )
+        )
+            
             result = ClassificationResult(
                 sys_name=sys_name,
                 total_records=len(sys_records),
+
+                valid_records=sum(
+                    1 for r in sys_records
+                    if r.result == "Accepted"
+                ),
+
+                status_summary=status_summary,
+
                 unique_note_count=len(unique_unids),
+
                 note_unids=sorted(list(unique_unids))
             )
+
             self.classifications[sys_name] = result
 
         return self.classifications

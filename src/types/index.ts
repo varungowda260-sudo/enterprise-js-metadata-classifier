@@ -25,18 +25,31 @@ export type ProcessingStatus =
   | 'cancelled'
   | 'error';
 
-export interface ClassificationResult {
+export interface ClassificationResult{
   sys_name: string;
+
   total_records: number;
+
+  valid_records: number;
+
+  status_summary: string;
+
   unique_note_count: number;
+
   note_unids: string[];
 }
+
 
 export interface LogEntry {
   timestamp: string;
   file_name: string;
   action: string;
   status: string;
+
+  
+  result: string;
+  reason: string;
+
   error_message: string;
 }
 

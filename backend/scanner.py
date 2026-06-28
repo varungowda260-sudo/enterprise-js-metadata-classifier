@@ -106,24 +106,41 @@ class FileScanner:
             )
 
             if not record.is_valid:
+                record.result = "Parser Error"
+                record.reason = "; ".join(record.parse_errors)
+
                 skipped = SkippedFile(
                     file_name=file_path.name,
-                    reason="; ".join(record.parse_errors)
+                    reason=record.reason
                 )
-                self.logger.log_parse_error(file_path.name, "; ".join(record.parse_errors))
+
+                self.logger.log_parse_error(file_path.name, record.reason)
                 return None, skipped
 
-            self.logger.log_parse_success(file_path.name)
 
             # Apply filter
             should_include, reason = self.filter_engine.should_include(record)
 
             if should_include:
+                record.result = "Accepted"
+                record.reason = "Passed all validation filters"
+
                 self.logger.log_classify_success(file_path.name)
                 return record, None
             else:
+                record.result = "Rejected"
+                record.reason = reason
+
                 self.logger.log_filter_skip(file_path.name, reason)
-                return None, SkippedFile(file_name=file_path.name, reason=reason)
+
+                return None, SkippedFile(
+                    file_name=file_path.name,
+                    sys_name=record.sys_name,
+                    note_unid=record.note_unid,
+                    status=record.status,
+                    reason=reason,
+                    result="Rejected"
+                )
 
         except Exception as e:
             error_msg = f"Processing error: {str(e)}"
@@ -204,13 +221,15 @@ class FileScanner:
                             self.stats.current_status = record.status
                         elif skipped:
                             self.skipped_files.append(skipped)
-                            if "cancel" in skipped.reason.lower() or "excluded" in skipped.reason.lower():
+                            if skipped.result == "Rejected":
                                 self.cancelled_records.append(
                                     MetadataRecord(
-                                        note_unid="",
-                                        sys_name="",
-                                        status="Cancel",
-                                        file_name=skipped.file_name
+                                        note_unid=skipped.note_unid,
+                                        sys_name=skipped.sys_name,
+                                        status=skipped.status,
+                                        file_name=skipped.file_name,
+                                        result=skipped.result,
+                                        reason=skipped.reason
                                     )
                                 )
                                 self.stats.cancelled_records += 1

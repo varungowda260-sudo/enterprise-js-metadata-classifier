@@ -312,7 +312,7 @@ def extract_note_unid(content: str) -> Optional[str]:
     Extract note_unid from the metadata content.
     note_unid is typically at the top level of the metadata object.
     """
-    return extract_top_level_field(content, "note_unid")
+    return extract_any_field(content, "note_unid")
 
 
 def extract_sys_name(content: str) -> Optional[str]:
