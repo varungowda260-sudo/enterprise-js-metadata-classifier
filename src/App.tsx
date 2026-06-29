@@ -582,8 +582,12 @@ function ProcessingDashboard() {
                           </TableCell>
                           
 
-                          <TableCell className="text-right">
-                            {formatNumber(c.unique_note_count)}
+                          <TableCell className="max-w-[450px] text-sm whitespace-normal break-words">
+                              {c.note_unids.length > 0
+                                  ? c.note_unids.map((id, index) => (
+                                      <div key={index}>{id}</div>
+                                    ))
+                                  : "-"}
                           </TableCell>
                         </TableRow>
                         ))}
