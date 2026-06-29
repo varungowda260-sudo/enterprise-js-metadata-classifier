@@ -66,7 +66,7 @@ class ExcelGenerator:
         # Data rows
         for row, result in enumerate(classifications, 2):
             ws.cell(row=row, column=1, value=result.sys_name).border = self.border
-            ws.cell(row=row, column=2, value=result.total_records).border = self.border
+            ws.cell(row=row, column=2, value=result.valid_records).border = self.border
             ws.cell(row=row, column=3, value=result.unique_note_count).border = self.border
             ws.cell(row=row, column=4, value=", ".join(result.note_unids)).border = self.border
 
