@@ -37,6 +37,8 @@ export interface ClassificationResult{
   unique_note_count: number;
 
   note_unids: string[];
+
+  status_note_map: Record<string, string[]>;
 }
 
 
