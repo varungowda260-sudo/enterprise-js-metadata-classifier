@@ -250,7 +250,7 @@ async def process_uploaded_zip(file: UploadFile = File(...)):
 
         # Classify records
         classifications = state.classification_engine.classify(
-            valid + cancelled
+            valid
         )
         state.stats.unique_systems = len(classifications)
 
@@ -314,7 +314,7 @@ async def process_folder(folder_path: str):
         state.stats = stats
 
         classifications = state.classification_engine.classify(
-            valid + cancelled
+            valid
        )
         state.stats.unique_systems = len(classifications)
 
