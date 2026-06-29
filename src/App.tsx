@@ -595,7 +595,7 @@ function ProcessingDashboard() {
                           
                                 <div key={status} className="mb-3">
                           
-                                  <div className="font-semibold text-gray-700">
+                                  <div className="text-muted-foreground">
                                     {status}
                                   </div>
                           
