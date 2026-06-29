@@ -40,7 +40,8 @@ class AppState:
     scanner: Optional[FileScanner] = None
     filter_engine: FilterEngine
     logger: ProcessingLogger
-    classification_engine: ClassificationEngine
+    ui_classification_engine: ClassificationEngine
+    excel_classification_engine: ClassificationEngine
     ui_classifications: Dict[str, ModelClassificationResult] = {}
     excel_classifications: Dict[str, ModelClassificationResult] = {}
     valid_records: List[MetadataRecord] = []
@@ -55,10 +56,9 @@ class AppState:
     def __init__(self):
         self.filter_engine = FilterEngine()
         self.logger = ProcessingLogger()
-        self.classification_engine = ClassificationEngine()
-        self.ui_classifications = {}
-        self.excel_classifications = {}
-        
+        self.ui_classification_engine = ClassificationEngine()
+        self.excel_classification_engine = ClassificationEngine()
+
         
 
 
@@ -256,17 +256,13 @@ async def process_uploaded_zip(file: UploadFile = File(...)):
 
 
             # ---------- UI Classification ----------
-        state.ui_classifications = state.classification_engine.classify(
-            valid + cancelled
-        )
+        state.ui_classification_engine.classify(all_records)
 
 
             # ---------- Excel Classification ----------
         excel_engine = ClassificationEngine()\
 
-        state.excel_classifications = excel_engine.classify(
-    valid
-)    
+        state.excel_classification_engine.classify(valid_records)
         state.stats.unique_systems = len(state.ui_classifications)
 
 
@@ -330,17 +326,13 @@ async def process_folder(folder_path: str):
         state.stats = stats
 
          # ---------- UI Classification ----------
-        state.ui_classifications = state.classification_engine.classify(
-            valid + cancelled
-        )
+        state.ui_classification_engine.classify(all_records)
 
 
             # ---------- Excel Classification ----------
         excel_engine = ClassificationEngine()\
 
-        state.excel_classifications = excel_engine.classify(
-    valid
-)    
+        state.excel_classification_engine.classify(valid_records)
         state.stats.unique_systems = len(state.ui_classifications)
 
 
