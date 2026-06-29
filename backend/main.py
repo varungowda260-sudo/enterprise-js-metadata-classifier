@@ -433,10 +433,26 @@ async def get_classifications():
 @app.post("/api/search")
 async def search_records(query: SearchQuery):
     """Search records by various criteria."""
-    results = state.ui_classification_engine.search(
-    sys_name=query.sys_name,
-    note_unid=query.note_unid,
-    status=query.status
+results = []
+
+for classification in state.ui_classifications.values():
+    match = True
+
+    if query.sys_name:
+        if query.sys_name.lower() not in classification.sys_name.lower():
+            match = False
+
+    if query.note_unid:
+        found = any(
+            query.note_unid.lower() in uid.lower()
+            for uid in classification.note_unids
+        )
+        if not found:
+            match = False
+
+    if match:
+        results.append(classification)
+
 
     return {
         "results": [
