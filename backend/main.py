@@ -257,13 +257,13 @@ async def process_uploaded_zip(file: UploadFile = File(...)):
 
             # ---------- UI Classification ----------
         all_records = valid + cancelled
-        state.ui_classification_engine.classify(all_records)
+        state.ui_classifications = state.ui_classification_engine.classify(all_records)
 
 
             # ---------- Excel Classification ----------
         
 
-        state.excel_classification_engine.classify(valid_records)
+        state.excel_classifications = state.excel_classification_engine.classify(valid)
         state.stats.unique_systems = len(state.ui_classifications)
 
 
@@ -276,7 +276,7 @@ async def process_uploaded_zip(file: UploadFile = File(...)):
             for c in state.excel_classifications.values()
         )
         state.excel_bytes = generator.generate(
-             list(state.excel_classifications.values())
+            list(state.excel_classifications.values()),
             valid,
             skipped,
             stats,
@@ -328,13 +328,13 @@ async def process_folder(folder_path: str):
 
          # ---------- UI Classification ----------
         all_records = valid + cancelled
-        state.ui_classification_engine.classify(all_records)
+        state.ui_classifications = state.ui_classification_engine.classify(all_records)
 
 
             # ---------- Excel Classification ----------
        
 
-        state.excel_classification_engine.classify(valid_records)
+        state.excel_classifications = state.excel_classification_engine.classify(valid)
         state.stats.unique_systems = len(state.ui_classifications)
 
 
@@ -347,7 +347,7 @@ async def process_folder(folder_path: str):
             for c in state.excel_classifications.values()
         )
         state.excel_bytes = generator.generate(
-            list(state.excel_classifications.values())
+            list(state.excel_classifications.values()),
             valid,
             skipped,
             stats,
@@ -433,25 +433,25 @@ async def get_classifications():
 @app.post("/api/search")
 async def search_records(query: SearchQuery):
     """Search records by various criteria."""
-results = []
+    results = []
 
-for classification in state.ui_classifications.values():
-    match = True
-
-    if query.sys_name:
-        if query.sys_name.lower() not in classification.sys_name.lower():
-            match = False
-
-    if query.note_unid:
-        found = any(
-            query.note_unid.lower() in uid.lower()
-            for uid in classification.note_unids
-        )
-        if not found:
-            match = False
-
-    if match:
-        results.append(classification)
+    for classification in state.ui_classifications.values():
+            match = True
+        
+            if query.sys_name:
+                if query.sys_name.lower() not in classification.sys_name.lower():
+                    match = False
+        
+            if query.note_unid:
+                found = any(
+                    query.note_unid.lower() in uid.lower()
+                    for uid in classification.note_unids
+                )
+                if not found:
+                    match = False
+        
+            if match:
+                results.append(classification)
 
 
     return {
