@@ -114,15 +114,13 @@ class ClassificationResult(BaseModel):
 
     valid_records: int
 
-    cancelled_records: int
-
-    accepted_status: str
-
-    cancelled_status: str
+    status_summary: str
 
     unique_note_count: int
 
     note_unids: List[str]
+
+    status_note_map: Dict[str, List[str]]
 
 
 class FilterRuleCreate(BaseModel):
