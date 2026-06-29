@@ -286,7 +286,7 @@ function ProcessingDashboard() {
 };
 
   const handleExportLogs = (format: 'json' | 'csv') => {
-    window.open(api.exportLogs(format), '_blank');
+    window.location.href = api.exportLogs(format);
     
   };
 
