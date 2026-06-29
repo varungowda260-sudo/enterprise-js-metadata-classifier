@@ -444,20 +444,20 @@ async def search_records(query: SearchQuery):
     for classification in state.ui_classifications.values():
         match = True
         
-            if query.sys_name:
-                if query.sys_name.lower() not in classification.sys_name.lower():
-                    match = False
+        if query.sys_name:
+            if query.sys_name.lower() not in classification.sys_name.lower():
+                match = False
         
-            if query.note_unid:
-                found = any(
-                    query.note_unid.lower() in uid.lower()
-                    for uid in classification.note_unids
-                )
-                if not found:
-                    match = False
+        if query.note_unid:
+            found = any(
+                query.note_unid.lower() in uid.lower()
+                for uid in classification.note_unids
+            )
+            if not found:
+                match = False
         
-            if match:
-                results.append(classification)
+        if match:
+            results.append(classification)
 
 
     return {
