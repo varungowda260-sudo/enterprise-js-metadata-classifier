@@ -45,8 +45,8 @@ class ClassificationEngine:
             for r in sys_records:
                 if r.note_unid:
                     unique_unids.add(r.note_unid)
-                     status = (r.status or "").strip()
-                     if r.note_unid not in status_note_map[status]:
+                    status = (r.status or "").strip()
+                    if r.note_unid not in status_note_map[status]:
                          status_note_map[status].append(r.note_unid)
 
                        
@@ -80,7 +80,7 @@ class ClassificationEngine:
 
                 unique_note_count=len(unique_unids),
 
-                note_unids=sorted(list(unique_unids))
+                note_unids=sorted(list(unique_unids)),
 
                 status_note_map=dict(status_note_map)
             )
