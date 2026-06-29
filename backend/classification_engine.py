@@ -40,10 +40,16 @@ class ClassificationEngine:
         for sys_name, sys_records in self._records_by_system.items():
             # Collect unique note_unids
             unique_unids = set()
+            status_note_map = defaultdict(list)
 
             for r in sys_records:
                 if r.note_unid:
                     unique_unids.add(r.note_unid)
+                     status = (r.status or "").strip()
+                     if r.note_unid not in status_note_map[status]:
+                         status_note_map[status].append(r.note_unid)
+
+                       
             # Count occurrences of each status
             status_counts = {}
             
@@ -75,6 +81,8 @@ class ClassificationEngine:
                 unique_note_count=len(unique_unids),
 
                 note_unids=sorted(list(unique_unids))
+
+                status_note_map=dict(status_note_map)
             )
 
             self.classifications[sys_name] = result
