@@ -400,7 +400,8 @@ async def get_classifications():
                 "valid_records": c.valid_records,
                 "status_summary": c.status_summary,
                 "unique_note_count": c.unique_note_count,
-                "note_unids": c.note_unids# Limit for response size
+                "note_unids": c.note_unids,  
+                "status_note_map": c.status_note_map,
             }
             for c in state.classification_engine.get_all_classifications()
         ]
@@ -424,7 +425,8 @@ async def search_records(query: SearchQuery):
                 "valid_records": r.valid_records,
                 "status_summary": r.status_summary,
                 "unique_note_count": r.unique_note_count,
-                "note_unids": r.note_unids[:50]
+                "note_unids": r.note_unids[:50],
+                "status_note_map": r.status_note_map,
             }
             for r in results
         ]
