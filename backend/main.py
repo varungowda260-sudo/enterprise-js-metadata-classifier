@@ -26,7 +26,7 @@ backend_dir = Path(__file__).parent
 if str(backend_dir) not in sys.path:
     sys.path.insert(0, str(backend_dir))
 
-from models import MetadataRecord, ProcessingStats, ProcessingStatus, SkippedFile
+from models import MetadataRecord, ProcessingStats, ProcessingStatus, SkippedFile,  ClassificationResult as ModelClassificationResult
 from parser import parse_js_metadata_content
 from filter_engine import FilterEngine, FilterRule, FilterOperator, FilterAction
 from classification_engine import ClassificationEngine
@@ -41,6 +41,8 @@ class AppState:
     filter_engine: FilterEngine
     logger: ProcessingLogger
     classification_engine: ClassificationEngine
+    ui_classifications: Dict[str, ModelClassificationResult] = {}
+    excel_classifications: Dict[str, ModelClassificationResult] = {}
     valid_records: List[MetadataRecord] = []
     cancelled_records: List[MetadataRecord] = []
     skipped_files: List[SkippedFile] = []
@@ -54,6 +56,10 @@ class AppState:
         self.filter_engine = FilterEngine()
         self.logger = ProcessingLogger()
         self.classification_engine = ClassificationEngine()
+        self.ui_classifications = {}
+        self.excel_classifications = {}
+        
+        
 
 
 state = AppState()
@@ -248,20 +254,30 @@ async def process_uploaded_zip(file: UploadFile = File(...)):
         state.skipped_files = skipped
         state.stats = stats
 
-        # Classify records
-        classifications = state.classification_engine.classify(
-            valid
+
+            # ---------- UI Classification ----------
+        state.ui_classifications = state.classification_engine.classify(
+            valid + cancelled
         )
-        state.stats.unique_systems = len(classifications)
+
+
+            # ---------- Excel Classification ----------
+        excel_engine = ClassificationEngine()\
+
+        state.excel_classifications = excel_engine.classify(
+    valid
+)    
+        state.stats.unique_systems = len(state.ui_classifications)
+
 
         # Generate Excel report
         generator = ExcelGenerator()
 
         # Calculate duplicates (records with duplicate note_unids per system)
-        duplicates = 0
-        for classification in classifications.values():
-            duplicates += classification.total_records - classification.unique_note_count
-
+        duplicates = sum(
+            c.total_records - c.unique_note_count
+            for c in state.excel_classifications.values()
+        )
         state.excel_bytes = generator.generate(
             list(classifications.values()),
             valid,
@@ -313,17 +329,29 @@ async def process_folder(folder_path: str):
         state.skipped_files = skipped
         state.stats = stats
 
-        classifications = state.classification_engine.classify(
-            valid
-       )
-        state.stats.unique_systems = len(classifications)
-
-        generator = ExcelGenerator()
-        duplicates = sum(
-            c.total_records - c.unique_note_count
-            for c in classifications.values()
+         # ---------- UI Classification ----------
+        state.ui_classifications = state.classification_engine.classify(
+            valid + cancelled
         )
 
+
+            # ---------- Excel Classification ----------
+        excel_engine = ClassificationEngine()\
+
+        state.excel_classifications = excel_engine.classify(
+    valid
+)    
+        state.stats.unique_systems = len(state.ui_classifications)
+
+
+        # Generate Excel report
+        generator = ExcelGenerator()
+
+        # Calculate duplicates (records with duplicate note_unids per system)
+        duplicates = sum(
+            c.total_records - c.unique_note_count
+            for c in state.excel_classifications.values()
+        )
         state.excel_bytes = generator.generate(
             list(classifications.values()),
             valid,
@@ -331,7 +359,6 @@ async def process_folder(folder_path: str):
             stats,
             duplicates
         )
-
         return {
             "status": "completed",
             "stats": stats.to_dict(),
@@ -401,7 +428,10 @@ async def get_classifications():
                 "note_unids": c.note_unids,  
                 "status_note_map": c.status_note_map,
             }
-            for c in state.classification_engine.get_all_classifications()
+            for c in sorted(
+                state.ui_classifications.values(),
+                key=lambda x: x.sys_name
+            )
         ]
     }
 
@@ -409,11 +439,25 @@ async def get_classifications():
 @app.post("/api/search")
 async def search_records(query: SearchQuery):
     """Search records by various criteria."""
-    results = state.classification_engine.search(
-        sys_name=query.sys_name,
-        note_unid=query.note_unid,
-        status=query.status
-    )
+    results = []
+
+for classification in state.ui_classifications.values():
+    match = True
+
+    if query.sys_name:
+        if query.sys_name.lower() not in classification.sys_name.lower():
+            match = False
+
+    if query.note_unid:
+        found = any(
+            query.note_unid.lower() in uid.lower()
+            for uid in classification.note_unids
+        )
+        if not found:
+            match = False
+
+    if match:
+        results.append(classification)
 
     return {
         "results": [
