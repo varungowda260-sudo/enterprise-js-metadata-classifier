@@ -400,7 +400,7 @@ async def get_classifications():
                 "valid_records": c.valid_records,
                 "status_summary": c.status_summary,
                 "unique_note_count": c.unique_note_count,
-                "note_unids": c.note_unids[:100]  # Limit for response size
+                "note_unids": c.note_unids# Limit for response size
             }
             for c in state.classification_engine.get_all_classifications()
         ]
