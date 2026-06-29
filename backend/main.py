@@ -256,11 +256,12 @@ async def process_uploaded_zip(file: UploadFile = File(...)):
 
 
             # ---------- UI Classification ----------
+        all_records = valid + cancelled
         state.ui_classification_engine.classify(all_records)
 
 
             # ---------- Excel Classification ----------
-        excel_engine = ClassificationEngine()\
+        
 
         state.excel_classification_engine.classify(valid_records)
         state.stats.unique_systems = len(state.ui_classifications)
@@ -275,7 +276,7 @@ async def process_uploaded_zip(file: UploadFile = File(...)):
             for c in state.excel_classifications.values()
         )
         state.excel_bytes = generator.generate(
-            list(classifications.values()),
+             list(state.excel_classifications.values())
             valid,
             skipped,
             stats,
@@ -288,7 +289,7 @@ async def process_uploaded_zip(file: UploadFile = File(...)):
             "valid_records": len(valid),
             "cancelled_records": len(cancelled),
             "skipped_files": len(skipped),
-            "unique_systems": len(classifications)
+            "unique_systems": len(state.ui_classifications)
         }
 
 
@@ -326,11 +327,12 @@ async def process_folder(folder_path: str):
         state.stats = stats
 
          # ---------- UI Classification ----------
+        all_records = valid + cancelled
         state.ui_classification_engine.classify(all_records)
 
 
             # ---------- Excel Classification ----------
-        excel_engine = ClassificationEngine()\
+       
 
         state.excel_classification_engine.classify(valid_records)
         state.stats.unique_systems = len(state.ui_classifications)
@@ -345,7 +347,7 @@ async def process_folder(folder_path: str):
             for c in state.excel_classifications.values()
         )
         state.excel_bytes = generator.generate(
-            list(classifications.values()),
+            list(state.excel_classifications.values())
             valid,
             skipped,
             stats,
@@ -357,7 +359,7 @@ async def process_folder(folder_path: str):
             "valid_records": len(valid),
             "cancelled_records": len(cancelled),
             "skipped_files": len(skipped),
-            "unique_systems": len(classifications)
+            "unique_systems": len(state.ui_classifications)
         }
 
 
@@ -431,25 +433,10 @@ async def get_classifications():
 @app.post("/api/search")
 async def search_records(query: SearchQuery):
     """Search records by various criteria."""
-    results = []
-
-for classification in state.ui_classifications.values():
-    match = True
-
-    if query.sys_name:
-        if query.sys_name.lower() not in classification.sys_name.lower():
-            match = False
-
-    if query.note_unid:
-        found = any(
-            query.note_unid.lower() in uid.lower()
-            for uid in classification.note_unids
-        )
-        if not found:
-            match = False
-
-    if match:
-        results.append(classification)
+    results = state.ui_classification_engine.search(
+    sys_name=query.sys_name,
+    note_unid=query.note_unid,
+    status=query.status
 
     return {
         "results": [
