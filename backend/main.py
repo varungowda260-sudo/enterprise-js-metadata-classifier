@@ -222,6 +222,8 @@ async def process_uploaded_zip(file: UploadFile = File(...)):
         state.logger.clear()
         state.valid_records.clear()
         state.cancelled_records.clear()
+        state.ui_classifications.clear()
+        state.excel_classifications.clear()
         state.skipped_files.clear()
         state.stats = ProcessingStats()
 
@@ -255,12 +257,12 @@ async def process_uploaded_zip(file: UploadFile = File(...)):
         state.stats = stats
 
 
-            # ---------- UI Classification ----------
+        # ---------- UI Classification ----------
         all_records = valid + cancelled
         state.ui_classifications = state.ui_classification_engine.classify(all_records)
 
 
-            # ---------- Excel Classification ----------
+        # ---------- Excel Classification ----------
         
 
         state.excel_classifications = state.excel_classification_engine.classify(valid)
@@ -306,6 +308,8 @@ async def process_folder(folder_path: str):
     async with state.processing_lock:
         state.logger.clear()
         state.valid_records.clear()
+        state.ui_classifications.clear()
+        state.excel_classifications.clear()
         state.cancelled_records.clear()
         state.skipped_files.clear()
         state.stats = ProcessingStats()
@@ -326,12 +330,12 @@ async def process_folder(folder_path: str):
         state.skipped_files = skipped
         state.stats = stats
 
-         # ---------- UI Classification ----------
+        # ---------- UI Classification ----------
         all_records = valid + cancelled
         state.ui_classifications = state.ui_classification_engine.classify(all_records)
 
 
-            # ---------- Excel Classification ----------
+        # ---------- Excel Classification ----------
        
 
         state.excel_classifications = state.excel_classification_engine.classify(valid)
@@ -399,6 +403,8 @@ async def reset():
 
     state.logger.clear()
     state.valid_records.clear()
+    state.ui_classifications.clear()
+    state.excel_classifications.clear()
     state.cancelled_records.clear()
     state.skipped_files.clear()
     state.stats = ProcessingStats()
@@ -436,7 +442,7 @@ async def search_records(query: SearchQuery):
     results = []
 
     for classification in state.ui_classifications.values():
-            match = True
+        match = True
         
             if query.sys_name:
                 if query.sys_name.lower() not in classification.sys_name.lower():
