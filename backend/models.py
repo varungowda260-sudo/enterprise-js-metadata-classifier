@@ -53,6 +53,8 @@ class ClassificationResult:
 
     note_unids: list = field(default_factory=list)
 
+    status_note_map: dict = field(default_factory=dict)
+
 @dataclass
 class ProcessingStats:
     """Real-time processing statistics."""
