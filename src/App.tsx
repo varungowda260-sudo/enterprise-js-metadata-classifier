@@ -588,11 +588,33 @@ function ProcessingDashboard() {
                           
 
                           <TableCell className="max-w-[450px] text-sm whitespace-normal break-words">
-                              {c.note_unids.length > 0
-                                  ? c.note_unids.map((id, index) => (
-                                      <div key={index}>{id}</div>
-                                    ))
-                                  : "-"}
+
+                            {Object.keys(c.status_note_map).length > 0 ? (
+                          
+                              Object.entries(c.status_note_map).map(([status, ids]) => (
+                          
+                                <div key={status} className="mb-3">
+                          
+                                  <div className="font-semibold text-gray-700">
+                                    {status}
+                                  </div>
+                          
+                                  {ids.map((id) => (
+                                    <div key={id} className="ml-3">
+                                      • {id}
+                                    </div>
+                                  ))}
+                          
+                                </div>
+                          
+                              ))
+                          
+                            ) : (
+                          
+                              "-"
+                          
+                            )}
+                          
                           </TableCell>
                         </TableRow>
                         ))}
