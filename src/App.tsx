@@ -559,7 +559,7 @@ function ProcessingDashboard() {
                           <TableHead>Sys Name</TableHead>
                           <TableHead className="text-right">Valid Records</TableHead>
                           <TableHead className="w-[340px]">Status Summary</TableHead>
-                          <TableHead className="text-right">Unique Notes</TableHead>
+                          <TableHead className="w-[450px]">Unique Note UNIDs</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
