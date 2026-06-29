@@ -286,7 +286,12 @@ function ProcessingDashboard() {
 };
 
   const handleExportLogs = (format: 'json' | 'csv') => {
-    window.location.href = api.exportLogs(format);
+    const link = document.createElement("a");
+    link.href = api.exportLogs(format);
+    link.download = "";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     
   };
 
