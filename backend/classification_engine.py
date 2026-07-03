@@ -46,16 +46,38 @@ class ClassificationEngine:
             closure_date_map = defaultdict(list)
 
             for r in sys_records:
-                if r.note_unid:
-                    unique_unids.add(r.note_unid)
-                    status = (r.status or "").strip()
-                    if r.note_unid not in status_note_map[status]:
-                         status_note_map[status].append(r.note_unid)
-                        if r.cc_number and r.cc_number not in cc_number_map[r.status]:
-                                cc_number_map[r.status].append(r.cc_number)
-                            
-                            if r.implementation_date and r.implementation_date not in implementation_date_map[r.status]:
-                                implementation_date_map[r.status].append(r.implementation_date)
+    status = (r.status or "").strip()
+
+    # Note UNIDs
+    if r.note_unid:
+        unique_unids.add(r.note_unid)
+        if r.note_unid not in status_note_map[status]:
+            status_note_map[status].append(r.note_unid)
+
+    # Change Request Numbers
+    if r.cc_number:
+        if r.cc_number not in cc_number_map[status]:
+            cc_number_map[status].append(r.cc_number)
+
+    # Go Live Dates
+    if r.implementation_date:
+        if r.implementation_date not in implementation_date_map[status]:
+            implementation_date_map[status].append(r.implementation_date)
+
+    # Closure Dates
+    closure = []
+
+    if r.itqm_closure_date:
+        closure.append(r.itqm_closure_date)
+
+    if r.cqa_closure_date:
+        closure.append(r.cqa_closure_date)
+
+    closure_text = "\n".join(closure)
+
+    if closure_text:
+        if closure_text not in closure_date_map[status]:
+            closure_date_map[status].append(closure_text)
                             
                             closure = []
                             
@@ -103,7 +125,13 @@ class ClassificationEngine:
 
                 note_unids=sorted(list(unique_unids)),
 
-                status_note_map=dict(status_note_map)
+                status_note_map=dict(status_note_map),
+
+                cc_number_map=dict(cc_number_map),
+
+                implementation_date_map=dict(implementation_date_map),
+
+                closure_date_map=dict(closure_date_map),         
             )
 
             self.classifications[sys_name] = result
