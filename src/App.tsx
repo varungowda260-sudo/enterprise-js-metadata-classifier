@@ -103,7 +103,7 @@ function StatCard({
 function ProcessingDashboard() {
   const [stats, setStats] = useState<ProcessingStats>(initialStats);
   const [classifications, setClassifications] = useState<ClassificationResult[]>([]);
-  const [, setRecords] = useState<MetadataRecord[]>([]);
+  const [records, setRecords] = useState<MetadataRecord[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -527,6 +527,9 @@ function ProcessingDashboard() {
               <BarChart3 className="h-4 w-4" />
               Classifications
             </TabsTrigger>
+            <TabsTrigger value="details" className="gap-2">
+                Details
+            </TabsTrigger>
             <TabsTrigger value="activity" className="gap-2">
               <Zap className="h-4 w-4" />
               Activity Log
@@ -570,6 +573,25 @@ function ProcessingDashboard() {
                       : 'Upload and process files to see classification results'}
                   </div>
                 ) : (
+
+          <TabsContent value="details" className="space-y-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">
+                  Detailed Records
+                </CardTitle>
+                <CardDescription>
+                  All accepted metadata records
+                </CardDescription>
+              </CardHeader>
+          
+              <CardContent>
+                {records.length === 0 ? (
+                  <div className="py-12 text-center text-muted-foreground">
+                    No records available
+                  </div>
+                ) : ( 
+      
                   <ScrollArea className="h-[500px]">
                     <Table>
                       <TableHeader>
@@ -578,10 +600,14 @@ function ProcessingDashboard() {
                           <TableHead className="text-right">Valid Records</TableHead>
                           <TableHead className="w-[340px]">Status Summary</TableHead>
                           <TableHead className="w-[450px]">Unique Note UNIDs</TableHead>
+                          <TableHead className="w-[340px]">Change Request No </TableHead>
+                          <TableHead className="w-[340px]">Go Live Date Production</TableHead>                      
+                          <TableHead className="w-[340px]">Change Request Closure Date</TableHead>                          
+                          <TableHead>Note UNID</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredClassifications.map((c) => (
+                        records.map((record) =>  (
                                   <TableRow key={c.sys_name}>
                           <TableCell className="font-medium">
                             {c.sys_name}
