@@ -36,7 +36,7 @@ import {
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 import { api, createWebSocket } from '@/services/api';
-import type { ProcessingStats, ClassificationResult, LogEntry, ParserTestResult } from '@/types';
+import type { ProcessingStats, ClassificationResult, MetadataRecord, LogEntry, ParserTestResult } from '@/types';
 import { formatDuration, formatNumber } from '@/hooks/useProcessing';
 
 const initialStats: ProcessingStats = {
@@ -103,6 +103,7 @@ function StatCard({
 function ProcessingDashboard() {
   const [stats, setStats] = useState<ProcessingStats>(initialStats);
   const [classifications, setClassifications] = useState<ClassificationResult[]>([]);
+  const [records, setRecords] = useState<MetadataRecord[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -170,6 +171,7 @@ function ProcessingDashboard() {
   useEffect(() => {
     if (stats.status === 'completed') {
       fetchClassifications();
+      fetchRecords();
       fetchLogs();
     }
   }, [stats.status]);
@@ -182,6 +184,14 @@ function ProcessingDashboard() {
       console.error('Failed to fetch classifications:', e);
     }
   };
+  const fetchRecords = async () => {
+  try {
+    const data = await api.getRecords();
+    setRecords(data.records);
+  } catch (e) {
+    console.error("Failed to fetch records:", e);
+  }
+};
 
   const fetchLogs = async () => {
     try {
