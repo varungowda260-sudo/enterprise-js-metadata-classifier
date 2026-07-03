@@ -94,7 +94,7 @@ class ExcelGenerator:
             cell = ws.cell(row=1, column=col, value=header)
             cell.font = self.header_font
             cell.fill = self.header_fill
-            cell.alignment = self.header_alignment
+            cell.alignment = Alignment(vertical="top", wrap_text=True)
             cell.border = self.border
 
         # Data rows - stream in chunks for memory efficiency
