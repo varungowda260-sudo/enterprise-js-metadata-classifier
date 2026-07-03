@@ -41,6 +41,9 @@ class ClassificationEngine:
             # Collect unique note_unids
             unique_unids = set()
             status_note_map = defaultdict(list)
+            cc_number_map = defaultdict(list)
+            implementation_date_map = defaultdict(list)
+            closure_date_map = defaultdict(list)
 
             for r in sys_records:
                 if r.note_unid:
@@ -48,6 +51,24 @@ class ClassificationEngine:
                     status = (r.status or "").strip()
                     if r.note_unid not in status_note_map[status]:
                          status_note_map[status].append(r.note_unid)
+                        if r.cc_number and r.cc_number not in cc_number_map[r.status]:
+                                cc_number_map[r.status].append(r.cc_number)
+                            
+                            if r.implementation_date and r.implementation_date not in implementation_date_map[r.status]:
+                                implementation_date_map[r.status].append(r.implementation_date)
+                            
+                            closure = []
+                            
+                                    if r.itqm_closure_date:
+                                        closure.append(r.itqm_closure_date)
+                                    
+                                            if r.cqa_closure_date:
+                                                closure.append(r.cqa_closure_date)
+                                            
+                                            closure_text = "\n".join(closure)
+                            
+                                                    if closure_text and closure_text not in closure_date_map[r.status]:
+                                                        closure_date_map[r.status].append(closure_text)
 
                        
             # Count occurrences of each status
