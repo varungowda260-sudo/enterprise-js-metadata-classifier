@@ -128,6 +128,12 @@ class ClassificationResult(BaseModel):
 
     status_note_map: Dict[str, List[str]]
 
+    cc_number_map: Dict[str, List[str]]
+
+    implementation_date_map: Dict[str, List[str]]
+
+    closure_date_map: Dict[str, List[str]]
+
 class MetadataRecordResponse(BaseModel):
     file_name: str
     sys_name: str
@@ -440,6 +446,9 @@ async def get_classifications():
                 "unique_note_count": c.unique_note_count,
                 "note_unids": c.note_unids,  
                 "status_note_map": c.status_note_map,
+                "cc_number_map": c.cc_number_map,
+                "implementation_date_map": c.implementation_date_map,        
+                "closure_date_map": c.closure_date_map,
             }
             for c in sorted(
                 state.ui_classifications.values(),
