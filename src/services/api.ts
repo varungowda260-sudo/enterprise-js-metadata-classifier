@@ -3,6 +3,7 @@
 import type {
   ProcessingStats,
   ClassificationResult,
+  MetadataRecord,
   LogEntry,
   FilterRule,
   UploadResponse,
@@ -100,6 +101,8 @@ export const api = {
   getStats: () => apiRequest<ProcessingStats>('/api/stats'),
   getClassifications: () =>
     apiRequest<{ classifications: ClassificationResult[] }>('/api/classifications'),
+  getRecords: () =>
+    apiRequest<{ records: MetadataRecord[] }>('/api/records'),
 
   search: (query: SearchQuery) =>
     apiRequest<{ results: ClassificationResult[] }>('/api/search', {
