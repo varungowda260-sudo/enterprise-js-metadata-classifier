@@ -103,7 +103,7 @@ function StatCard({
 function ProcessingDashboard() {
   const [stats, setStats] = useState<ProcessingStats>(initialStats);
   const [classifications, setClassifications] = useState<ClassificationResult[]>([]);
-  const [records, setRecords] = useState<MetadataRecord[]>([]);
+  const [, setRecords] = useState<MetadataRecord[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -527,10 +527,6 @@ function ProcessingDashboard() {
               <BarChart3 className="h-4 w-4" />
               Classifications
             </TabsTrigger>
-            <TabsTrigger value="details" className="gap-2">
-              <FileText className="h-4 w-4" />
-                Details
-            </TabsTrigger>
             <TabsTrigger value="activity" className="gap-2">
               <Zap className="h-4 w-4" />
               Activity Log
@@ -574,25 +570,6 @@ function ProcessingDashboard() {
                       : 'Upload and process files to see classification results'}
                   </div>
                 ) : (
-
-          <TabsContent value="details" className="space-y-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">
-                  Detailed Records
-                </CardTitle>
-                <CardDescription>
-                  All accepted metadata records
-                </CardDescription>
-              </CardHeader>
-          
-              <CardContent>
-                {records.length === 0 ? (
-                  <div className="py-12 text-center text-muted-foreground">
-                    No records available
-                  </div>
-                ) : ( 
-      
                   <ScrollArea className="h-[500px]">
                     <Table>
                       <TableHeader>
@@ -601,14 +578,10 @@ function ProcessingDashboard() {
                           <TableHead className="text-right">Valid Records</TableHead>
                           <TableHead className="w-[340px]">Status Summary</TableHead>
                           <TableHead className="w-[450px]">Unique Note UNIDs</TableHead>
-                          <TableHead className="w-[340px]">Change Request No </TableHead>
-                          <TableHead className="w-[340px]">Go Live Date Production</TableHead>                      
-                          <TableHead className="w-[340px]">Change Request Closure Date</TableHead>                          
-                          <TableHead>Note UNID</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        records.map((record) =>  (
+                        {filteredClassifications.map((c) => (
                                   <TableRow key={c.sys_name}>
                           <TableCell className="font-medium">
                             {c.sys_name}
@@ -892,40 +865,6 @@ function ProcessingDashboard() {
                         </span>
                       </div>
                     </div>
-
-                     <div className="grid grid-cols-3 gap-2 text-sm">
-                       <span className="text-muted-foreground">Change Request No:</span>
-                       <span className={`col-span-2 font-mono ${parserTestResult.details.cc_number_found ? '' : 'text-red-500'}`}>
-                         {parserTestResult.cc_number || '(NOT FOUND)'}
-                       </span>
-                     </div>
-
-                     <div className="grid grid-cols-3 gap-2 text-sm">
-                       <span className="text-muted-foreground">Go Live Date:</span>
-                       <span className={`col-span-2 font-mono ${parserTestResult.details.implementation_date_found ? '' : 'text-red-500'}`}>
-                         {parserTestResult.go_live_date_production || '(NOT FOUND)'}
-                       </span>
-                     </div>
-                    
-                     <div className="grid grid-cols-3 gap-2 text-sm">
-                       <span className="text-muted-foreground">ITQM Closure Date:</span>
-                       <span className={`col-span-2 font-mono ${parserTestResult.details.itqm_closure_date_found ? '' : 'text-red-500'}`}>
-                         {parserTestResult.itqm_closure_date || '(NOT FOUND)'}
-                       </span>
-                     </div>
-
-
-                     <div className="grid grid-cols-3 gap-2 text-sm">
-                       <span className="text-muted-foreground">CQA Closure Date:</span>
-                       <span className={`col-span-2 font-mono ${parserTestResult.details.cqa_closure_date_found ? '' : 'text-red-500'}`}>
-                         {parserTestResult.cqa_closure_date || '(NOT FOUND)'}
-                       </span>
-                     </div>
-
-                    
-                    
-                      
-                     
 
                     {/* Missing Fields */}
                     {parserTestResult.missing_fields.length > 0 && (
