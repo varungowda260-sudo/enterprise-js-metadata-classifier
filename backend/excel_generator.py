@@ -71,6 +71,9 @@ class ExcelGenerator:
             cell=ws.cell(row=row, column=4, value="\n".join(result.note_unids))
             cell.border = self.border
             cell.alignment = Alignment(vertical="top", wrap_text=True)
+        for row in ws.iter_rows():
+            for cell in row:
+                cell.alignment = Alignment(vertical="top", wrap_text=True)
 
         # Adjust column widths
         ws.column_dimensions['A'].width = 30
