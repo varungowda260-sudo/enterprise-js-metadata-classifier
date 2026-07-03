@@ -395,11 +395,10 @@ def parse_js_metadata_content(content: str, file_name: str = "unknown") -> Metad
     sys_name = extract_sys_name(content)
     status = extract_status(content)
     cc_number = extract_any_field(content, "cc_number")
-    go_live_date_production = extract_any_field(content, "imp_date")
-    itqm_closure = extract_any_field(content, "sec7_itqm_date_hist")
-    cqa_closure = extract_any_field(content, "sec7_cqa_date_hist")
-    closure_date = itqm_closure or cqa_closure or ""
-
+    implementation_date = extract_any_field(content, "imp_date")
+    itqm_closure_date = extract_any_field(content, "sec7_itqm_date_hist")
+    cqa_closure_date = extract_any_field(content, "sec7_cqa_date_hist")
+   
     # Track which fields are missing
     if not note_unid:
         errors.append("Missing note_unid")
@@ -417,7 +416,7 @@ def parse_js_metadata_content(content: str, file_name: str = "unknown") -> Metad
         status=status or "",
         file_name=file_name,
         cc_number=cc_number or "",
-        go_live_date_production=go_live_date_production or "",
+        implementation_date=implementation_date or "",
         itqm_closure_date=itqm_closure_date or "",
         cqa_closure_date=cqa_closure_date or "",
         is_valid=is_valid,
@@ -449,8 +448,9 @@ def parse_js_metadata_file(file_path: Path) -> MetadataRecord:
                 status="",
                 file_name=file_path.name,
                 cc_number="",
-               go_live_date_production="",
-                closure_date="",
+                implementation_date="",
+                itqm_closure_date="",
+                cqa_closure_date="",
                 is_valid=False,
                 parse_errors=[f"Failed to read file: {str(e)}"]
             )
@@ -461,8 +461,9 @@ def parse_js_metadata_file(file_path: Path) -> MetadataRecord:
             status="",
             file_name=file_path.name,
             cc_number="",
-            go_live_date_production="",
-            closure_date="",
+            implementation_date="",
+            itqm_closure_date="",
+            cqa_closure_date="",
             is_valid=False,
             parse_errors=[f"Failed to read file: {str(e)}"]
         )
