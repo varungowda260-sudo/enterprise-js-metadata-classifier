@@ -128,6 +128,19 @@ class ClassificationResult(BaseModel):
 
     status_note_map: Dict[str, List[str]]
 
+class MetadataRecordResponse(BaseModel):
+    file_name: str
+    sys_name: str
+    status: str
+
+    cc_number: str
+
+    go_live_date_production: str
+
+    closure_date: str
+
+    note_unid: str
+
 
 class FilterRuleCreate(BaseModel):
     field: str
@@ -435,6 +448,33 @@ async def get_classifications():
         ]
     }
 
+@app.get("/api/records")
+async def get_records():
+    """Return detailed metadata records."""
+
+    records = []
+
+    for record in sorted(state.valid_records, key=lambda r: r.sys_name):
+
+        closure_dates = []
+
+        if record.itqm_closure_date:
+            closure_dates.append(record.itqm_closure_date)
+
+        if record.cqa_closure_date:
+            closure_dates.append(record.cqa_closure_date)
+
+        records.append({
+            "file_name": record.file_name,
+            "sys_name": record.sys_name,
+            "status": record.status,
+            "cc_number": record.cc_number,
+            "go_live_date_production": record.implementation_date,
+            "closure_date": "\n".join(closure_dates),
+            "note_unid": record.note_unid,
+        })
+
+    return {"records": records}
 
 @app.post("/api/search")
 async def search_records(query: SearchQuery):
