@@ -60,6 +60,12 @@ class ClassificationResult:
 
     status_note_map: dict = field(default_factory=dict)
 
+    cc_number_map: dict = field(default_factory=dict)
+
+    implementation_date_map: dict = field(default_factory=dict)
+
+    closure_date_map: dict = field(default_factory=dict)
+
 @dataclass
 class ProcessingStats:
     """Real-time processing statistics."""
