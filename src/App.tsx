@@ -528,6 +528,7 @@ function ProcessingDashboard() {
               Classifications
             </TabsTrigger>
             <TabsTrigger value="details" className="gap-2">
+              <FileText className="h-4 w-4" />
                 Details
             </TabsTrigger>
             <TabsTrigger value="activity" className="gap-2">
