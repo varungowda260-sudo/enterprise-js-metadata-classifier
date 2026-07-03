@@ -4,13 +4,10 @@ Excel Report Generator for JavaScript Metadata Classification.
 Generates multi-sheet Excel reports with streaming for large datasets.
 """
 import io
-from datetime import datetime
 from pathlib import Path
-from typing import List, Dict
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.utils.dataframe import dataframe_to_rows
-import pandas as pd
+
 
 from models import MetadataRecord, ClassificationResult, SkippedFile, ProcessingStats
 
@@ -125,6 +122,9 @@ class ExcelGenerator:
             cell = ws.cell(row=row, column=7, value=record.note_unid)
             cell.border = self.border
             cell.alignment = Alignment(vertical="top", wrap_text=True)
+            for cell in ws[row]:
+                cell.alignment = Alignment(vertical="top", wrap_text=True)
+                  
 
         # Adjust column widths
         ws.column_dimensions['A'].width = 35
@@ -206,6 +206,10 @@ class ExcelGenerator:
         for row, (metric, value) in enumerate(metrics, 2):
             ws.cell(row=row, column=1, value=metric).border = self.border
             ws.cell(row=row, column=2, value=value).border = self.border
+        for row in ws.iter_rows():
+            for cell in row:
+                cell.alignment = Alignment(vertical="top", wrap_text=True)
+                
 
         # Adjust column widths
         ws.column_dimensions['A'].width = 30
