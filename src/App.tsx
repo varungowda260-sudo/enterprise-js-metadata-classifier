@@ -103,7 +103,7 @@ function StatCard({
 function ProcessingDashboard() {
   const [stats, setStats] = useState<ProcessingStats>(initialStats);
   const [classifications, setClassifications] = useState<ClassificationResult[]>([]);
-  const [records, setRecords] = useState<MetadataRecord[]>([]);
+  const [, setRecords] = useState<MetadataRecord[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
