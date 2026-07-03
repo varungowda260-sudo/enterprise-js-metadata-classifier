@@ -418,7 +418,8 @@ def parse_js_metadata_content(content: str, file_name: str = "unknown") -> Metad
         file_name=file_name,
         cc_number=cc_number or "",
         go_live_date_production=go_live_date_production or "",
-        closure_date=closure_date,
+        itqm_closure_date=itqm_closure_date or "",
+        cqa_closure_date=cqa_closure_date or "",
         is_valid=is_valid,
         parse_errors=errors
     )
