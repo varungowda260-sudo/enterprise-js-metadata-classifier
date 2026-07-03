@@ -907,6 +907,36 @@ function ProcessingDashboard() {
                         </span>
                       </div>
                     </div>
+                      <div className="grid grid-cols-3 gap-2 text-sm">
+                        <span className="text-muted-foreground">
+                          Change Request No:
+                        </span>
+                        <span className="col-span-2 font-mono">
+                          {parserTestResult.cc_number || "(NOT FOUND)"}
+                        </span>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-2 text-sm">
+                        <span className="text-muted-foreground">
+                          Go Live Date Production:
+                        </span>
+                        <span className="col-span-2 font-mono">
+                          {parserTestResult.go_live_date_production || "(NOT FOUND)"}
+                        </span>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-2 text-sm">
+                        <span className="text-muted-foreground">
+                          Change Request Closure Date:
+                        </span>
+                      
+                        <span className="col-span-2 whitespace-pre-line font-mono">
+                          {[parserTestResult.itqm_closure_date,
+                            parserTestResult.cqa_closure_date]
+                            .filter(Boolean)
+                            .join("\n") || "(NOT FOUND)"}
+                        </span>
+                      </div>
 
                     {/* Missing Fields */}
                     {parserTestResult.missing_fields.length > 0 && (
