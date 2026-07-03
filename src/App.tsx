@@ -578,6 +578,10 @@ function ProcessingDashboard() {
                           <TableHead className="text-right">Valid Records</TableHead>
                           <TableHead className="w-[340px]">Status Summary</TableHead>
                           <TableHead className="w-[450px]">Unique Note UNIDs</TableHead>
+                          <TableHead className="w-[450px]">Change Request No.</TableHead>
+                          <TableHead className="w-[450px]">Go Live Date Production</TableHead>
+                          
+                          <TableHead>Change Request Closure Date</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -629,6 +633,44 @@ function ProcessingDashboard() {
                             )}
                           
                           </TableCell>
+                          <TableCell className="align-top">
+                            {Object.entries(c.cc_number_map).map(([status, numbers]) => (
+                              <div key={status} className="mb-3">
+                                <div className="text-muted-foreground">{status}</div>
+                          
+                                {numbers.map((n) => (
+                                  <div key={n}>• {n}</div>
+                                ))}
+                              </div>
+                            ))}
+                          </TableCell>
+                          <TableCell className="align-top">
+                            {Object.entries(c.implementation_date_map).map(([status, dates]) => (
+                              <div key={status} className="mb-3">
+                                <div className="text-muted-foreground">{status}</div>
+                          
+                                {dates.map((d) => (
+                                  <div key={d}>• {d}</div>
+                                ))}
+                              </div>
+                            ))}
+                          </TableCell>
+
+                          <TableCell className="align-top">
+                            {Object.entries(c.closure_date_map).map(([status, dates]) => (
+                              <div key={status} className="mb-3">
+                                <div className="text-muted-foreground">{status}</div>
+                          
+                                {dates.map((d) => (
+                                  <div key={d} className="whitespace-pre-line">
+                                    • {d}
+                                  </div>
+                                ))}
+                              </div>
+                            ))}
+                          </TableCell>
+
+                                    
                         </TableRow>
                         ))}
                       </TableBody>
