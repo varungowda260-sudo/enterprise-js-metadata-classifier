@@ -519,6 +519,9 @@ async def search_records(query: SearchQuery):
                 "unique_note_count": r.unique_note_count,
                 "note_unids": r.note_unids[:50],
                 "status_note_map": r.status_note_map,
+                "cc_number_map": r.cc_number_map,
+                "implementation_date_map": r.implementation_date_map,
+                "closure_date_map": r.closure_date_map,
             }
             for r in results
         ]
