@@ -450,7 +450,6 @@ def parse_js_metadata_file(file_path: Path) -> MetadataRecord:
                 cc_number="",
                 implementation_date="",
                 closure_date="",
-
                 is_valid=False,
                 parse_errors=[f"Failed to read file: {str(e)}"]
             )
@@ -460,6 +459,9 @@ def parse_js_metadata_file(file_path: Path) -> MetadataRecord:
             sys_name="",
             status="",
             file_name=file_path.name,
+            cc_number="",
+            implementation_date="",
+            closure_date="",
             is_valid=False,
             parse_errors=[f"Failed to read file: {str(e)}"]
         )
