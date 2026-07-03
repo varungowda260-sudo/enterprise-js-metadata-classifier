@@ -110,11 +110,19 @@ export interface ParserTestResult {
   note_unid: string;
   sys_name: string;
   status: string;
+  cc_number: string;
+  go_live_date_production: string;
+  itqm_closure_date: string;
+  cqa_closure_date: string;
   parser_status: 'PASS' | 'FAIL';
   missing_fields: string[];
   details: {
     note_unid_found: boolean;
     sys_name_found: boolean;
     status_found: boolean;
+    cc_number_found: boolean;
+    implementation_date_found: boolean;
+    itqm_closure_date_found: boolean;
+    cqa_closure_date_found: boolean;
   };
 }
