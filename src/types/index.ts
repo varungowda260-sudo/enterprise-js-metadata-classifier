@@ -39,6 +39,12 @@ export interface ClassificationResult{
   note_unids: string[];
 
   status_note_map: Record<string, string[]>;
+
+  cc_number_map: Record<string,string[]>
+
+  implementation_date_map: Record<string,string[]>
+  
+  closure_date_map: Record<string,string[]>
 }
 
 export interface MetadataRecord {
