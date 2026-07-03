@@ -228,6 +228,7 @@ function ProcessingDashboard() {
     }
   };
 
+  
   const handlePause = async () => {
     try {
       await api.pause();
