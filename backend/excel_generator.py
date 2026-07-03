@@ -68,7 +68,9 @@ class ExcelGenerator:
             ws.cell(row=row, column=1, value=result.sys_name).border = self.border
             ws.cell(row=row, column=2, value=result.valid_records).border = self.border
             ws.cell(row=row, column=3, value=result.unique_note_count).border = self.border
-            ws.cell(row=row, column=4, value="\n".join(result.note_unids)).border = self.border
+            cell=ws.cell(row=row, column=4, value="\n".join(result.note_unids)).border = self.border
+            cell.border = self.border
+            cell.alignment = Alignment(vertical="top", wrap_text=True)
 
         # Adjust column widths
         ws.column_dimensions['A'].width = 30
@@ -89,7 +91,7 @@ class ExcelGenerator:
         ws = self.workbook.create_sheet("Details")
 
         # Headers
-        headers = ["File Name", "Sys Name", "Change Request Status", "Note_UNID","CC Number","Go Live Date Production","ITQM Closure Date", "CQA Closure Date","Note UNID"]
+        headers = ["File Name", "Sys Name", "Change Request Status","Change Request No","Go Live Date Production","Closure Date","Note UNID"]
         for col, header in enumerate(headers, 1):
             cell = ws.cell(row=1, column=col, value=header)
             cell.font = self.header_font
@@ -99,20 +101,32 @@ class ExcelGenerator:
 
         # Data rows - stream in chunks for memory efficiency
         for row, record in enumerate(valid_records, 2):
+            closure_dates = []
+            if record.itqm_closure_date:
+                closure_dates.append(record.itqm_closure_date)
+            if record.cqa_closure_date:
+                closure_dates.append(record.cqa_closure_date)
+                
+            closure_value = "\n".join(closure_dates)  
             ws.cell(row=row, column=1, value=record.file_name).border = self.border
             ws.cell(row=row, column=2, value=record.sys_name).border = self.border
             ws.cell(row=row, column=3, value=record.status).border = self.border
             ws.cell(row=row, column=4, value=record.cc_number)
-            ws.cell(row=row, column=5, value=record.go_live_date_production)
-            ws.cell(row=row, column=6, value=record.itqm_closure_date)
-            ws.cell(row=row, column=7, value=record.cqa_closure_date)
-            ws.cell(row=row, column=4, value=record.note_unid).border = self.border
+            ws.cell(row=row, column=5, value=record.implementation_date)
+            ws.cell(row=row, column=6, value=record.closure_date)
+            cell = ws.cell(row=row, column=6, value=closure_value)
+            cell.border = self.border
+            cell.alignment = Alignment(vertical="top", wrap_text=True)
+            ws.cell(row=row, column=7, value=record.note_unid).border = self.border
 
         # Adjust column widths
-        ws.column_dimensions['A'].width = 40
+        ws.column_dimensions['A'].width = 35
         ws.column_dimensions['B'].width = 25
-        ws.column_dimensions['C'].width = 15
-        ws.column_dimensions['D'].width = 40
+        ws.column_dimensions['C'].width = 24
+        ws.column_dimensions['D'].width = 28
+        ws.column_dimensions['E'].width = 24
+        ws.column_dimensions['F'].width = 35
+        ws.column_dimensions['G'].width = 40
 
     def create_skipped_sheet(
         self,
