@@ -68,7 +68,7 @@ class ExcelGenerator:
             ws.cell(row=row, column=1, value=result.sys_name).border = self.border
             ws.cell(row=row, column=2, value=result.valid_records).border = self.border
             ws.cell(row=row, column=3, value=result.unique_note_count).border = self.border
-            ws.cell(row=row, column=4, value=", ".join(result.note_unids)).border = self.border
+            ws.cell(row=row, column=4, value="\n".join(result.note_unids)).border = self.border
 
         # Adjust column widths
         ws.column_dimensions['A'].width = 30
@@ -89,7 +89,7 @@ class ExcelGenerator:
         ws = self.workbook.create_sheet("Details")
 
         # Headers
-        headers = ["File Name", "Sys Name", "Status", "Note_UNID"]
+        headers = ["File Name", "Sys Name", "Change Request Status", "Note_UNID","CC Number","Go Live Date Production","ITQM Closure Date", "CQA Closure Date","Note UNID"]
         for col, header in enumerate(headers, 1):
             cell = ws.cell(row=1, column=col, value=header)
             cell.font = self.header_font
@@ -102,6 +102,10 @@ class ExcelGenerator:
             ws.cell(row=row, column=1, value=record.file_name).border = self.border
             ws.cell(row=row, column=2, value=record.sys_name).border = self.border
             ws.cell(row=row, column=3, value=record.status).border = self.border
+            ws.cell(row=row, column=4, value=record.cc_number)
+            ws.cell(row=row, column=5, value=record.go_live_date_production)
+            ws.cell(row=row, column=6, value=record.itqm_closure_date)
+            ws.cell(row=row, column=7, value=record.cqa_closure_date)
             ws.cell(row=row, column=4, value=record.note_unid).border = self.border
 
         # Adjust column widths
