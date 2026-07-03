@@ -341,6 +341,10 @@ function ProcessingDashboard() {
     c.sys_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredRecords = records.filter((r) =>
+  r.sys_name.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
