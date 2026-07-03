@@ -592,13 +592,18 @@ async def test_parser(file: UploadFile = File(...)):
         "status": record.status,
         "cc_number": record.cc_number,
         "go_live_date_production": record.implementation_date,
-        "closure_date": record.closure_date,
+        "itqm_closure_date": record.itqm_closure_date,
+        "cqa_closure_date": record.cqa_closure_date,
         "parser_status": "PASS" if record.is_valid else "FAIL",
         "missing_fields": record.parse_errors,
         "details": {
             "note_unid_found": bool(record.note_unid),
             "sys_name_found": bool(record.sys_name),
-            "status_found": bool(record.status)
+            "status_found": bool(record.status),
+            "cc_number_found": bool(record.cc_number),
+            "implementation_date_found": bool(record.implementation_date),   
+            "itqm_closure_date_found": bool(record.itqm_closure_date),        
+            "cqa_closure_date_found": bool(record.cqa_closure_date)
         }
     }
 
