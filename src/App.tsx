@@ -866,6 +866,40 @@ function ProcessingDashboard() {
                       </div>
                     </div>
 
+                     <div className="grid grid-cols-3 gap-2 text-sm">
+                       <span className="text-muted-foreground">Change Request No:</span>
+                       <span className={`col-span-2 font-mono ${parserTestResult.details.cc_number_found ? '' : 'text-red-500'}`}>
+                         {parserTestResult.cc_number || '(NOT FOUND)'}
+                       </span>
+                     </div>
+
+                     <div className="grid grid-cols-3 gap-2 text-sm">
+                       <span className="text-muted-foreground">Go Live Date:</span>
+                       <span className={`col-span-2 font-mono ${parserTestResult.details.implementation_date_found ? '' : 'text-red-500'}`}>
+                         {parserTestResult.go_live_date_production || '(NOT FOUND)'}
+                       </span>
+                     </div>
+                    
+                     <div className="grid grid-cols-3 gap-2 text-sm">
+                       <span className="text-muted-foreground">ITQM Closure Date:</span>
+                       <span className={`col-span-2 font-mono ${parserTestResult.details.itqm_closure_date_found ? '' : 'text-red-500'}`}>
+                         {parserTestResult.itqm_closure_date || '(NOT FOUND)'}
+                       </span>
+                     </div>
+
+
+                     <div className="grid grid-cols-3 gap-2 text-sm">
+                       <span className="text-muted-foreground">CQA Closure Date:</span>
+                       <span className={`col-span-2 font-mono ${parserTestResult.details.cqa_closure_date_found ? '' : 'text-red-500'}`}>
+                         {parserTestResult.cqa_closure_date || '(NOT FOUND)'}
+                       </span>
+                     </div>
+
+                    
+                    
+                      
+                     
+
                     {/* Missing Fields */}
                     {parserTestResult.missing_fields.length > 0 && (
                       <>
