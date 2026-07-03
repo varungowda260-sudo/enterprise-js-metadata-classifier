@@ -71,6 +71,7 @@ class ExcelGenerator:
             cell=ws.cell(row=row, column=4, value="\n".join(result.note_unids))
             cell.border = self.border
             cell.alignment = Alignment(vertical="top", wrap_text=True)
+            ws.row_dimensions[row].height = max(18, len(result.note_unids) * 18)
         for row in ws.iter_rows():
             for cell in row:
                 cell.alignment = Alignment(vertical="top", wrap_text=True)
@@ -119,6 +120,8 @@ class ExcelGenerator:
             cell = ws.cell(row=row, column=6, value=closure_value)
             cell.border = self.border
             cell.alignment = Alignment(vertical="top", wrap_text=True)
+            if len(closure_dates) > 1:
+                ws.row_dimensions[row].height = 36
             cell = ws.cell(row=row, column=7, value=record.note_unid)
             cell.border = self.border
             cell.alignment = Alignment(vertical="top", wrap_text=True)
