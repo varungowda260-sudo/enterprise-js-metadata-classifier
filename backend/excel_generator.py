@@ -116,7 +116,7 @@ class ExcelGenerator:
             cell = ws.cell(row=row, column=6, value=closure_value)
             cell.border = self.border
             cell.alignment = Alignment(vertical="top", wrap_text=True)
-            ws.cell(row=row, column=7, value=record.note_unid)
+            cell = ws.cell(row=row, column=7, value=record.note_unid)
             cell.border = self.border
             cell.alignment = Alignment(vertical="top", wrap_text=True)
 
