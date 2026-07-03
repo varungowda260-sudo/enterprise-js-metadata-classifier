@@ -91,7 +91,7 @@ class ExcelGenerator:
         ws = self.workbook.create_sheet("Details")
 
         # Headers
-        headers = ["File Name", "Sys Name", "Change Request Status","Change Request No.","Go Live Date Production","Closure Date","Note UNID"]
+        headers = ["File Name", "Sys Name", "Change Request Status","Change Request No.","Go Live Date Production","Change Request Closure Date","Note UNID"]
         for col, header in enumerate(headers, 1):
             cell = ws.cell(row=1, column=col, value=header)
             cell.font = self.header_font
