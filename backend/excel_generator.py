@@ -116,15 +116,17 @@ class ExcelGenerator:
             cell = ws.cell(row=row, column=6, value=closure_value)
             cell.border = self.border
             cell.alignment = Alignment(vertical="top", wrap_text=True)
-            ws.cell(row=row, column=7, value=record.note_unid).border = self.border
+            ws.cell(row=row, column=7, value=record.note_unid)
+            cell.border = self.border
+            cell.alignment = Alignment(vertical="top", wrap_text=True)
 
         # Adjust column widths
         ws.column_dimensions['A'].width = 35
         ws.column_dimensions['B'].width = 25
         ws.column_dimensions['C'].width = 24
         ws.column_dimensions['D'].width = 28
-        ws.column_dimensions['E'].width = 24
-        ws.column_dimensions['F'].width = 35
+        ws.column_dimensions['E'].width = 28
+        ws.column_dimensions['F'].width = 28
         ws.column_dimensions['G'].width = 40
 
     def create_skipped_sheet(
