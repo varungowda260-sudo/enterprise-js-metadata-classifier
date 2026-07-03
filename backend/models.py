@@ -23,8 +23,9 @@ class MetadataRecord:
     status: str
     file_name: str
     cc_number: str = ""
-    go_live_date_production: str = ""
-    closure_date: str = ""
+    implementation_date: str = ""
+    itqm_closure_date: str = ""
+    cqa_closure_date: str = ""
     
 
     # Parser validation
