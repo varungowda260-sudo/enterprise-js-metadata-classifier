@@ -21,10 +21,11 @@ class MetadataRecord:
     note_unid: str
     sys_name: str
     status: str
+    file_name: str
     cc_number: str = ""
     implementation_date: str = ""
     closure_date: str = ""
-    file_name: str
+    
 
     # Parser validation
     is_valid: bool = True
