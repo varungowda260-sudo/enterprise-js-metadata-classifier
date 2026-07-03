@@ -394,6 +394,11 @@ def parse_js_metadata_content(content: str, file_name: str = "unknown") -> Metad
     note_unid = extract_note_unid(content)
     sys_name = extract_sys_name(content)
     status = extract_status(content)
+    cc_number = extract_any_field(content, "cc_number")
+    implementation_date = extract_any_field(content, "imp_date")
+    itqm_closure = extract_any_field(content, "sec7_itqm_date_hist")
+    cqa_closure = extract_any_field(content, "sec7_cqa_date_hist")
+    closure_date = itqm_closure or cqa_closure or ""
 
     # Track which fields are missing
     if not note_unid:
@@ -411,6 +416,9 @@ def parse_js_metadata_content(content: str, file_name: str = "unknown") -> Metad
         sys_name=sys_name or "",
         status=status or "",
         file_name=file_name,
+        cc_number=cc_number or "",
+        implementation_date=implementation_date or "",
+        closure_date=closure_date,
         is_valid=is_valid,
         parse_errors=errors
     )
@@ -439,6 +447,10 @@ def parse_js_metadata_file(file_path: Path) -> MetadataRecord:
                 sys_name="",
                 status="",
                 file_name=file_path.name,
+                cc_number="",
+                implementation_date="",
+                closure_date="",
+
                 is_valid=False,
                 parse_errors=[f"Failed to read file: {str(e)}"]
             )
