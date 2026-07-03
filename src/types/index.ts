@@ -41,6 +41,20 @@ export interface ClassificationResult{
   status_note_map: Record<string, string[]>;
 }
 
+export interface MetadataRecord {
+  file_name: string;
+  sys_name: string;
+  status: string;
+
+  cc_number: string;
+
+  go_live_date_production: string;
+
+  closure_date: string;
+
+  note_unid: string;
+}
+
 
 export interface LogEntry {
   timestamp: string;
