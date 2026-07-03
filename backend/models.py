@@ -23,7 +23,7 @@ class MetadataRecord:
     status: str
     file_name: str
     cc_number: str = ""
-    implementation_date: str = ""
+    go_live_date_production: str = ""
     closure_date: str = ""
     
 
