@@ -591,7 +591,7 @@ async def test_parser(file: UploadFile = File(...)):
         "sys_name": record.sys_name,
         "status": record.status,
         "cc_number": record.cc_number,
-        "implementation_date": record.implementation_date,
+        "go_live_date_production": record.implementation_date,
         "closure_date": record.closure_date,
         "parser_status": "PASS" if record.is_valid else "FAIL",
         "missing_fields": record.parse_errors,
